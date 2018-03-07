@@ -1,4 +1,4 @@
-('use strict';
+'use strict';
 import MenuTypes from './types';
 
 /** Creates a simple menu item to be clicked.

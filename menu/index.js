@@ -174,7 +174,7 @@ class Menu {
  that.handleKeys(event);
 		});
 
-		speech.speak(this.name);
+
 		this.sndOpen.play();
 		const heading = document.createElement('h1');
 		const node = document.createTextNode(this.name);

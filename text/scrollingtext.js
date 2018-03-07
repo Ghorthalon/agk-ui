@@ -12,15 +12,14 @@ import TTS from 'agk-tts';
 class ScrollingText {
 	constructor(element, text, delimiter = '\n', callback = 0) {
 		this.id = element;
-		this.id.hidden = false;
 		this.container = document.createElement('div');
 		this.textDiv = document.createElement('div');
-		this.textDiv.innerHTML = 'Meow';
+		
 		this.container.appendChild(this.textDiv);
 		this.continueButton = document.createElement('input');
 		this.continueButton.type = 'button';
 		this.continueButton.value = 'Scroll';
-		const that = this;
+
 		this.continueButton.addEventListener('click', () => this.advance());
 		this.container.appendChild(this.continueButton);
 		this.id.appendChild(this.container);
@@ -32,14 +31,14 @@ class ScrollingText {
 		this.sndContinue = so.create('ui/textScroll');
 		this.sndClose = so.create('ui/textClose');
 		this.callback = callback;
-		const id = document.getElementById('touchArea');
+
 		// This.hammer = new Hammer(id);
 		this.init();
 	}
 
 	init() {
-		const that = this;
-		runningText = this;
+		
+		
 
 		this.sndOpen.play();
 		this.currentLine = 0;
@@ -82,7 +81,6 @@ class ScrollingText {
 		} else {
 			this.sndClose.play();
 
-			this.id.hidden = true;
 
 			//			This.hammer.destroy();
 			if (this.callback !== 0) {
