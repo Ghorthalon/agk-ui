@@ -10,7 +10,8 @@ import TTS from 'agk-tts';
 	* @param {function} callback - A function to call when the text has been advanced to it's end.
 */
 class ScrollingText {
-	constructor(element, text, delimiter = '\n', callback = 0) {
+	constructor(element, text, delimiter = '\n', soundData = null, callback = 0) {
+		this.soundData = soundData;
 		this.id = element;
 		this.container = document.createElement('div');
 		this.textDiv = document.createElement('div');
@@ -27,9 +28,12 @@ class ScrollingText {
 		this.delimiter = delimiter;
 		this.splitText = this.text.split(delimiter);
 		this.currentLine = 0;
-		this.sndOpen = so.create('ui/textOpen');
-		this.sndContinue = so.create('ui/textScroll');
-		this.sndClose = so.create('ui/textClose');
+		if (this.soundData) {
+			this.sndOpen = this.soundData.open;
+			this.sndContinue = this.soundData.continue;
+			this.sndClose = this.soundData.close;
+		}
+		
 		this.callback = callback;
 
 		// This.hammer = new Hammer(id);
@@ -40,7 +44,7 @@ class ScrollingText {
 		
 		
 
-		this.sndOpen.play();
+		if (this.sndOpen) this.sndOpen.play();
 		this.currentLine = 0;
 		this.readCurrentLine();
 	}
@@ -76,10 +80,10 @@ class ScrollingText {
 	advance() {
 		if (this.currentLine < this.splitText.length - 1) {
 			this.currentLine++;
-			this.sndContinue.play();
+			if (this.sndContinue) this.sndContinue.play();
 			this.readCurrentLine();
 		} else {
-			this.sndClose.play();
+			if (this.sndClose) this.sndClose.play();
 
 
 			//			This.hammer.destroy();

@@ -12,21 +12,24 @@ import KeyEvent from 'agk-input/keycodes';
 	* @param {array} menuData - the menu items to display
 */
 class Menu {
-	constructor(element, name, menuData) {
+	constructor(element, name, menuData, soundData = null) {
 		this.menuData = menuData;
+		this.soundData = soundData;
 		this.cursor = 0;
 		this.oldSlideValue = 0;
 		this.name = name;
-		this.sndKeyChar = so.create('ui/keyChar');
-		this.sndKeyDelete = so.create('ui/keyDelete');
-		this.sndSliderLeft = so.create('ui/menuSliderLeft');
-		this.sndSliderRight = so.create('ui/menuSliderRight');
-		this.sndBoundary = so.create('ui/menuBoundary');
-		this.sndChoose = so.create('ui/menuChoose');
-		this.sndMove = so.create('ui/menuMove');
-		this.sndOpen = so.create('ui/menuOpen');
-		this.sndSelector = so.create('ui/menuSelector');
-		this.sndWrap = so.create('ui/menuWrap');
+		if (this.soundData) {
+			this.sndKeyChar = this.soundData.keyChar;
+			this.sndKeyDelete = this.soundData.keyDelete;
+			this.sndSliderLeft = this.soundData.sliderLeft;
+			this.sndSliderRight = this.soundData.sliderRight;
+			this.sndBoundary = this.soundData.boundary;
+			this.sndChoose = this.soundData.choose;
+			this.sndMove = this.soundData.move;
+			this.sndOpen = this.soundData.open;
+			this.sndSelector = this.soundData.selector;
+			this.sndWrap = this.soundData.wrap;
+		}
 		this.selectCallback = null;
 		this.interactionElement = element;
 	}
@@ -54,7 +57,7 @@ class Menu {
 	/** Internal callback when an Item is focused. */
 	focusItem(event) {
 		console.log('Focused: ' + JSON.stringify(event));
-		this.sndMove.play();
+		if (this.sndMove) this.sndMove.play();
 		this.cursor = this.findCursorByID(event);
 	}
 
@@ -94,29 +97,29 @@ class Menu {
 
 	increase() {
 		if (this.menuData[this.cursor].type === MenuTypes.SLIDER) {
-				this.sndSliderRight.play();
+				if (this.sndSliderRight) this.sndSliderRight.play();
 		} else {
-				this.sndSelector.play();
+				if (this.sndSelector) this.sndSelector.play();
 		}
 	}
 
 	decrease() {
 		if (this.menuData[this.cursor].type === MenuTypes.SLIDER) {
-				this.sndSliderLeft.play();
+				if (this.sndSliderLeft) this.sndSliderLeft.play();
 		} else {
-				this.sndSelector.play();
+				if (this.sndSelector) this.sndSelector.play();
 		}
 	}
 
 	/** Internal callback when character is inserted. */
 	insertCharacter(char) {
-			this.sndKeyChar.play();
+			if (this.sndKeyChar) this.sndKeyChar.play();
 			console.log('Inserted ' + char);
 	}
 
 	/** Internal callback when character is removed. */
 	removeCharacter() {
-			this.sndKeyDelete.play();
+			if (this.sndKeyDelete) this.sndKeyDelete.play();
 	}
 
 	/** Internal callback to handle events. */
@@ -126,25 +129,24 @@ class Menu {
 
 	/** Internal function that destroys menu sounds. */
 	destroySounds() {
-		this.sndKeyChar.destroy();
-		this.sndKeyDelete.destroy();
-		this.sndSliderLeft.destroy();
-		this.sndSliderRight.destroy();
-		this.sndBoundary.destroy();
-		this.sndChoose.destroy();
-		this.sndMove.destroy();
-		this.sndOpen.destroy();
-		this.sndSelector.destroy();
-		this.sndWrap.destroy();
+		if (this.sndKeyChar) this.sndKeyChar.destroy();
+		if (this.sndKeyDelete) this.sndKeyDelete.destroy();
+		if (this.sndSliderLeft) this.sndSliderLeft.destroy();
+		if (this.sndSliderRight) this.sndSliderRight.destroy();
+		if (this.sndBoundary) this.sndBoundary.destroy();
+		if (this.sndChoose) this.sndChoose.destroy();
+		if (this.sndMove) this.sndMove.destroy();
+		if (this.sndOpen) this.sndOpen.destroy();
+		if (this.sndSelector) this.sndSelector.destroy();
+		if (this.sndWrap) this.sndWrap.destroy();
 	}
 
 	/** Destroys and frees the menu from memory. */
 	destroy() {
 		this.interactionElement.innerHTML = '';
-		const that = this;
 		setTimeout(() => {
- that.destroySounds();
-		}, 500);
+ this.destroySounds();
+		}, 1000);
 	}
 
 	/** Internal function to handle key events. */
@@ -175,7 +177,7 @@ class Menu {
 		});
 
 
-		this.sndOpen.play();
+		if (this.sndOpen) this.sndOpen.play();
 		const heading = document.createElement('h1');
 		const node = document.createTextNode(this.name);
 		heading.appendChild(node);
@@ -267,7 +269,7 @@ class Menu {
 			cursor: this.cursor,
 			items
 		};
-		this.sndChoose.play();
+		if (this.sndChoose) this.sndChoose.play();
 
 		this.selectCallback(toReturn);
 	}
