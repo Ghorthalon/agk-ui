@@ -1,0 +1,25 @@
+{
+  "name": "agk-ui",
+  "version": "0.0.0",
+  "description": "User Interface elements using HTMl and ARIA, mainly used for Audio Games",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "user",
+    "interface",
+    "simple",
+    "menu",
+    "edit",
+    "scroller",
+    "slider",
+    "audio",
+    "games"
+  ],
+  "author": "Ghorthalon",
+  "license": "MIT",
+  "dependencies": {
+    "jquery": "^3.3.1"
+  }
+}

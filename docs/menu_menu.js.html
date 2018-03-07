@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: menu/menu.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: menu/menu.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>"use strict";
+import $ from 'jquery';
+import so from 'agk-soundobject'
+import MenuTypes from './items/types';
+import EditItem from './items/edititem'
+import MenuItem from './items/menuitem'
+import SelectorItem from './items/selectoritem'
+import SliderItem from './types/slideritem'
+import KeyEvent from 'agk-input/keycodes'
+import KeyboardInput from 'agk-input'
+/** Builds simple HTML menus.
+	* @constructor
+	* @param {object} element - The DOMNode to render on
+	* @param {string} name - The menu title
+	* @param {array} menuData - the menu items to display
+*/
+class Menu {
+	constructor(element, name, menuData) {
+		this.menuData = menuData;
+		this.cursor = 0;
+		this.oldSlideValue = 0;
+		this.name = name;
+		this.sndKeyChar = so.create("ui/keyChar");
+		this.sndKeyDelete = so.create("ui/keyDelete");
+		this.sndSliderLeft = so.create("ui/menuSliderLeft");
+		this.sndSliderRight = so.create("ui/menuSliderRight");
+		this.sndBoundary = so.create("ui/menuBoundary");
+		this.sndChoose = so.create("ui/menuChoose");
+		this.sndMove = so.create("ui/menuMove");
+		this.sndOpen = so.create("ui/menuOpen");
+		this.sndSelector = so.create("ui/menuSelector");
+		this.sndWrap = so.create("ui/menuWrap");
+		this.selectCallback = null;
+		this.interactionElement = element;
+		
+		
+	}
+	
+	/** Internal callback when an item is clicked. */
+	clickItem(event) {
+		console.log("Clicked item " + JSON.stringify(event));
+		this.cursor = this.findCursorByID(event);
+		console.log("Cursor is at " + this.cursor);
+		console.log("Selecting");
+		this.select();
+	}
+	/** Internal callback  when a slider is moved. */
+	slideItem(event) {
+		if (this.menuData[this.cursor].input.value &lt; this.oldSlideValue) {
+			this.decrease();
+		} else {
+			this.increase();
+		}
+		this.oldSlideValue = this.menuData[this.cursor].input.value;
+		
+	}
+	/** Internal callback when an Item is focused. */
+	focusItem(event) {
+		console.log("Focused: " + JSON.stringify(event));
+		this.sndMove.play();
+		this.cursor = this.findCursorByID(event);
+	}
+	/** INternal callback when an item is changed. */
+	changeItem(event) {
+		this.cursor = this.findCursorByID(event);
+		this.increase();
+	}
+	/** Internal function that finds the cursor position of the menu item by it's id. */
+	findCursorByID(id) {
+		for (var i=0;i&lt;this.menuData.length;i++) {
+			if (this.menuData[i].id == id) return i;
+		
+		
+		}
+		return -1;
+		
+	}
+	/**  focuses the next item from the cursor. */
+	nextItem() {
+		
+		if (this.cursor &lt; this.menuData.length-1) this.cursor++;
+		
+		
+		this.menuData[this.cursor].focus();
+	}
+	
+	/** Focuses the previous item from the cursor. */
+	previousItem() {
+		if (this.cursor > 0) this.cursor--;
+		
+		this.menuData[this.cursor].focus();
+	}
+
+	increase() {
+
+
+			if (this.menuData[this.cursor].type == MenuTypes.SLIDER) {
+				this.sndSliderRight.play();
+			} else {
+				this.sndSelector.play();
+			}
+		
+		
+	}
+	
+	decrease() {
+
+			if (this.menuData[this.cursor].type == MenuTypes.SLIDER) {
+				this.sndSliderLeft.play();
+			} else {
+				this.sndSelector.play();
+			}
+			
+		
+	}
+	/** Internal callback when character is inserted. */
+	insertCharacter(char) {
+
+
+			this.sndKeyChar.play();
+		
+	}
+	/** Internal callback when character is removed. */
+	removeCharacter() {
+
+			this.sndKeyDelete.play();
+		
+	}
+	
+	/** Internal callback to handle events. */
+	handleInput(event) {
+		
+		
+			this.insertCharacter(event.which);
+		
+		
+	}
+	
+	/** Internal function that destroys menu sounds. */
+	destroySounds() {
+		this.sndKeyChar.destroy();
+		this.sndKeyDelete.destroy();
+		this.sndSliderLeft.destroy();
+		this.sndSliderRight.destroy();
+		this.sndBoundary.destroy();
+		this.sndChoose.destroy();
+		this.sndMove.destroy();
+		this.sndOpen.destroy();
+		this.sndSelector.destroy();
+		this.sndWrap.destroy();
+		
+	}
+	
+	/** Destroys and frees the menu from memory. */
+	destroy() {
+		
+		
+
+		this.interactionElement.innerHTML = '';
+		var that = this;
+		setTimeout(function() { that.destroySounds(); }, 500);
+	}
+	/** Internal function to handle key events. */
+	handleKeys(event) {
+		
+		
+			switch(event.which) {
+
+
+				case KeyEvent.DOM_VK_DOWN:
+				event.preventDefault();
+					this.nextItem();
+					break;
+				case KeyEvent.DOM_VK_UP:
+				event.preventDefault();
+					this.previousItem();
+					break;
+
+			}
+		}
+		
+		/** Runs the menu and displays it.
+		* @param {function} callback - the callback to be executed when the user selects an item, espects one event parameter.
+		*/
+	run(callback) {
+		this.selectCallback = callback;
+		var that = this;
+
+		$(document).on("keydown", function(event) { that.handleKeys(event) });
+
+		speech.speak(this.name);
+		this.sndOpen.play();
+		let heading = document.createElement("h1");
+		let node = document.createTextNode(this.name);
+		heading.appendChild(node);
+		this.interactionElement.appendChild(heading);
+		console.log("Menu length: "+ this.menuData.length);
+		for (var i=0;i&lt;this.menuData.length;i++) {
+			var that = this;
+if (this.menuData[i].type == MenuTypes.NORMAL) {
+			this.menuData[i].setCallbacks(function(event) { that.focusItem(event) }, function(event) 			{ that.clickItem(event) })
+		}
+		if (this.menuData[i].type == MenuTypes.SELECTOR) {
+			this.menuData[i].setCallbacks(function(event) { that.focusItem(event); }, function(event) { that.changeItem(event); });
+		}
+		
+		if (this.menuData[i].type == MenuTypes.EDIT) {
+			this.menuData[i].setCallbacks(function(event) { that.focusItem(event); }, function(event) { that.insertCharacter(event); });
+		}
+		
+				if (this.menuData[i].type == MenuTypes.SLIDER) {
+					this.menuData[i].setCallbacks(function(event) { that.focusItem(event); }, function(event) { that.slideItem(event); });
+				}
+				
+			this.interactionElement.appendChild(this.menuData[i].element);
+		}
+		
+	}
+	
+	/** Internal function when an item has been selected. */
+	select() {
+		console.log("Selected. Yay");
+		var selected = this.menuData[this.cursor].id;
+		
+		var items=[];
+		for (var i=0;i&lt;this.menuData.length;i++) {
+			var addItem = null;
+			console.log("Item type " + this.menuData[i].type);
+			if (this.menuData[i].type == MenuTypes.SLIDER) {
+				console.log("Evaluating Slider");
+				addItem = {
+					id:this.menuData[i].id,
+					value:this.menuData[i].input.value
+					
+				}
+			}
+			if (this.menuData[i].type == MenuTypes.EDIT) {
+				console.log("Evaluating edit item");
+				addItem = {
+					id:this.menuData[i].id,
+					value:this.menuData[i].input.value
+					
+				}
+			}
+			if (this.menuData[i].type == MenuTypes.SELECTOR) {
+				console.log("Evaluating selector");
+				let selectedID = 0;
+				let items = document.getElementsByName(this.menuData[i].id);
+				for (var j=0;j&lt;items.length;j++) {
+					if (items[j].checked) selectedID = j;
+				}
+				
+				addItem = {
+					id:this.menuData[i].id,
+					value:selectedID,
+
+					name:this.menuData[i].options[selectedID]
+				}
+			}
+			items.push(addItem);
+		}
+		
+		var toReturn = {
+			selected:selected,
+			cursor:this.cursor,
+			items:items
+		}
+		this.sndChoose.play();
+		
+		this.selectCallback(toReturn);
+	}
+
+}
+export default Menu</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="EditItem.html">EditItem</a></li><li><a href="Menu.html">Menu</a></li><li><a href="MenuItem.html">MenuItem</a></li><li><a href="ScrollingText.html">ScrollingText</a></li><li><a href="SelectorItem.html">SelectorItem</a></li><li><a href="SliderItem.html">SliderItem</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Mar 06 2018 21:38:09 GMT+0100 (CET)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
