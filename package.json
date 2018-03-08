@@ -1,6 +1,6 @@
 {
   "name": "agk-ui",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "User Interface elements using HTMl and ARIA, mainly used for Audio Games",
   "main": "index.js",
   "scripts": {
