@@ -20,6 +20,9 @@
   "author": "Ghorthalon",
   "license": "MIT",
   "dependencies": {
+    "agk-input": "0.0.0",
+    "agk-soundobject": "0.0.0",
+    "agk-tts": "0.0.0",
     "jquery": "^3.3.1"
   }
 }
