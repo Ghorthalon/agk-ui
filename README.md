@@ -57,20 +57,43 @@ All the components are submoduled. Here's a list.
 
 ### JavaScript
 
-import Menu from "agk-ui/menu";
+import SoundObject from "agk-soundobject";
+import ScrollingText from "agk-ui/text/scrollingtext"
 import EditItem from "agk-ui/menu/items/edititem";
 import MenuItem from "agk-ui/menu/items/menuitem";
-import ScrollerItem from "agk-ui/menu/items/scrolleritem";
+import SelectorItem from "agk-ui/menu/items/selectoritem";
 import SliderItem from "agk-ui/menu/items/slideritem";
-import ScrollingText from "agk-ui/text/scrollingtext";
+import Menu from "agk-ui/menu";
+
+SoundObject.directory = "./sounds/";
+SoundObject.extension = ".wav";
+
+let menuSounds = {};
+menuSounds.keyChar = SoundObject.create("ui/keyChar");
+menuSounds.keyDelete = SoundObject.create("ui/keyDelete");
+menuSounds.keyEnter = SoundObject.create("ui/keyEnter");
+menuSounds.boundary = SoundObject.create("ui/menuBoundary");
+menuSounds.choose = SoundObject.create("ui/menuChoose");
+menuSounds.move = SoundObject.create("ui/menuMove");
+menuSounds.open = SoundObject.create("ui/menuOpen");
+menuSounds.selector = SoundObject.create("ui/menuSelector");
+menuSounds.sliderLeft = SoundObject.create("ui/menuSliderLeft");
+menuSounds.sliderRight = SoundObject.create("ui/menuSliderRight");
+menuSounds.wrap = SoundObject.create("menuWrap");
+let textSounds = {};
+textSounds.continue = SoundObject.create("ui/textContinue");
+textSounds.close = SoundObject.create("ui/textClose");
+textSounds.open = SoundObject.create("ui/textOpen");
 
 const item1 = new MenuItem(1, "Meow");
 const item2 = new SelectorItem(2, "Male or Female", ["Male","Female"]);
 const item3 = new EditItem(3, "Enter your name");
 const item4 = new SliderItem(4, "Slide meow", 0, 100, 5);
-const menu = new Menu(document.getElementById("interaction"), Select something", [item1, item2, item3, item4]);
+
+const menu = new Menu(document.getElementById("interaction"), "Select something", [item1, item2, item3, item4], menuSounds);
 menu.run(e => {
-	new ScrollingText("Menu is done, selected item was " + e.selected + ", \n with all the stuff set to " + JSON.stringify(e.items), "\n", () => console.log("Completely done."));
+	menu.destroy();
+	new ScrollingText(document.getElementById("interaction"), "Menu is done, selected item was " + e.selected + ", \n with all the stuff set to " + JSON.stringify(e.items), "\n", textSounds, () => console.log("All done!"));
 });
 
 ## Contributing
