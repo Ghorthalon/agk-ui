@@ -74,7 +74,7 @@ class SelectorItem {
 			this.listElement.appendChild(this.elements[i]);
 		}
 		this.element.addEventListener('focus', this.focusItem.bind(this));
-		this.element.addEventListener('change', this.changeItem.bind(this));
+		this.element.addEventListener('click', this.changeItem.bind(this));
 	}
 
 	focusItem(event) {
@@ -83,21 +83,24 @@ class SelectorItem {
 			this.onFocusCallback(this.id);
 		}
 
-		for (let i = 0; i < this.elements.length; i++) {
-			this.elements[i].setAttribute('aria-checked', 'false');
-			if (this.elements[i].checked) {
-				this.elements[i].setAttribute('aria-checked', 'true');
-				if (this.customChangeCallback !== 0) {
-this.customChangeCallback(i);
-				}
-			}
-		}
+
 	}
 
 	changeItem(event) {
 		console.log('Change event: ' + event);
 		if (this.onChangeCallback !== 0) {
 			this.onChangeCallback(this.id);
+		}
+		
+		for (let i = 0; i < this.elements.length; i++) {
+			this.elements[i].setAttribute('aria-checked', 'false');
+			if (this.elements[i].checked) {
+				console.log("Checked: " + this.elements[i].value);
+				this.elements[i].setAttribute('aria-checked', 'true');
+				if (this.customChangeCallback !== 0) {
+this.customChangeCallback(this.elements[i].value);
+				}
+			}
 		}
 	}
 }
