@@ -185,6 +185,7 @@ class Menu {
 		console.log('Menu length: ' + this.menuData.length);
 		for (let i = 0; i < this.menuData.length; i++) {
 			if (this.menuData[i].type === MenuTypes.NORMAL) {
+				console.log("Setting normal menu callbacks");
 			this.menuData[i].setCallbacks(event => {
  this.focusItem(event);
 			}, event => {

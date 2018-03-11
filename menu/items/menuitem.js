@@ -41,7 +41,7 @@ class MenuItem {
 
 	getFocus(event) {
 		console.log(this.onFocusCallback);
-		if (this.onFocusCallback !== 0) {
+		if (this.onFocusCallback) {
 			this.onFocusCallback(this.id);
 		}
 	}
